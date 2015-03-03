@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC '-//ibatis.apache.org//DTD SQL Map 2.0//EN' 'http://ibatis.apache.org/dtd/sql-map-2.dtd'>
+
+<sqlMap namespace="sample">
+
+	<typeAlias alias="searchModel" type="java.util.Map"/>
+	<typeAlias alias="resultModel" type="java.util.Map"/>
+
+	<typeAlias alias="searchBean" type="com.jcf.sample.query.model.Sample"/>
+	<typeAlias alias="resultBean" type="com.jcf.sample.query.model.Sample"/>
+
+	<statement id="getSampleByModel" parameterClass="searchBean" resultClass="resultBean">
+		SELECT TAB.NOTI_NO,
+			   TAB.TITLE,
+			   TAB.CONTENT,
+			   TAB.USER_ID,
+			   TAB.REG_DAY,
+			   TAB.REG_TIME,
+			   TAB.USE_FLAG,
+			   TAB.CNT
+		  FROM SAMPLE TAB
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="notiNo">
+				NOTI_NO = #notiNo#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="title">
+				TITLE = #title#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="useFlag">
+				USE_FLAG = #useFlag#
+			</isNotEmpty>
+		</dynamic>
+	</statement>
+
+	<statement id="getSampleByMap" parameterClass="searchModel" resultClass="resultModel">
+		SELECT TAB.NOTI_NO,
+			   TAB.TITLE,
+			   TAB.CONTENT,
+			   TAB.USER_ID,
+			   TAB.REG_DAY,
+			   TAB.REG_TIME,
+			   TAB.USE_FLAG,
+			   TAB.CNT
+		  FROM SAMPLE TAB
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="notiNo">
+				NOTI_NO = #notiNo#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="title">
+				TITLE = #title#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="userId">
+				USER_ID = #userId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="useFlag">
+				USE_FLAG = #useFlag#
+			</isNotEmpty>
+		</dynamic>
+	</statement>
+
+	<statement id="getSampleByInt" parameterClass="searchBean" resultClass="java.lang.Integer">
+		SELECT COUNT(*) AS CNT
+		  FROM SAMPLE
+		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="userId">
+				USER_ID = #userId#
+			</isNotEmpty>
+		</dynamic>
+	</statement>
+
+	<insert id="insertSample" parameterClass="searchBean">
+		INSERT INTO SAMPLE (
+			NOTI_NO
+			,TITLE
+			,CONTENT
+			,USER_ID
+			,REG_DAY
+			,REG_TIME
+			,USE_FLAG
+		) VALUES (
+			#notiNo#
+			,#title#
+			,#content#
+			,#userId#
+			,#regDay#
+			,#regTime#
+			,#useFlag#
+		)
+	</insert>
+
+	<update id="updateSample" parameterClass="searchBean">
+		UPDATE SAMPLE
+		   SET CONTENT = #content#
+		<dynamic>
+			<isNotEmpty prepend="," property="title">TITLE = #title#</isNotEmpty>
+			<isNotEmpty prepend="," property="userId">USER_ID = #userId#</isNotEmpty>
+			<isNotEmpty prepend="," property="regDay">REG_DAY = #regDay#</isNotEmpty>
+			<isNotEmpty prepend="," property="regTime">REG_TIME = #regTime#</isNotEmpty>
+			<isNotEmpty prepend="," property="useFlag">USE_FLAG = #useFlag#</isNotEmpty>
+			<isNotEmpty prepend="," property="cnt">CNT = #cnt#</isNotEmpty>
+		</dynamic>
+		 WHERE NOTI_NO = #notiNo#
+	</update>
+
+	<delete id="deleteSample" parameterClass="searchBean">
+		DELETE FROM SAMPLE
+		 WHERE NOTI_NO = #notiNo#
+	</delete>
+
+</sqlMap>

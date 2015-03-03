@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC '-//ibatis.apache.org//DTD SQL Map 2.0//EN' 'http://ibatis.apache.org/dtd/sql-map-2.dtd'>
+
+<sqlMap namespace="stream">
+
+	<typeAlias alias="resultModel" type="java.util.Map"/>
+	<typeAlias alias="searchModel" type="java.util.Map"/>
+
+	<statement id="getSampleByMap"  resultClass="resultModel">
+		SELECT TITLE,
+			   CONTENT,
+			   USER_ID
+		  FROM LARGE_SAMPLE
+	</statement>
+
+</sqlMap>

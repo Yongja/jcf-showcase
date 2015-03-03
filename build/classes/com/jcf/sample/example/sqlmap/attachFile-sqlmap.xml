@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC '-//ibatis.apache.org//DTD SQL Map 2.0//EN' 'http://ibatis.apache.org/dtd/sql-map-2.dtd'>
+
+<sqlMap namespace="attachFile">
+
+	<select id="selectFileAttach" parameterClass="map" resultClass="com.jcf.sample.example.model.AttachFiles">
+		SELECT FILE_NAME,
+			   CALL_NAME,
+			   FOLD
+	      FROM TB_ATTACH_FILE
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="and" property="fileName">FILE_NAME = #fileName#</isNotEmpty>
+			<isNotEmpty prepend="and" property="callName">CALL_NAME = #callName#</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<insert id="insertFileAttach" parameterClass="com.jcf.sample.example.model.AttachFiles">
+		INSERT INTO TB_ATTACH_FILE
+			(
+				FILE_NAME
+				,CALL_NAME
+				,FOLD
+			) VALUES (
+        		#fileName#
+				,#callName#
+				,#fold#
+			)
+	</insert>
+
+	<update id="updateFileAttach" parameterClass="com.jcf.sample.example.model.AttachFiles">
+		UPDATE TB_ATTACH_FILE
+		   SET CALL_NAME = #callName#
+		   	   ,FOLD = #fold#
+		 WHERE FILE_NAME = #fileName#
+	</update>
+
+	<delete id="deleteFileAttach" parameterClass="com.jcf.sample.example.model.AttachFiles">
+		DELETE FROM TB_ATTACH_FILE
+		 WHERE FILE_NAME = #fileName#
+	</delete>
+
+</sqlMap>
+

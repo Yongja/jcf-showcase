@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	
+ 	<!-- 
+    6) Quartz의 핵심적인 기능을 할 /WEB-INF/config/applicationConext.xml 을 작성합니다.
+	스케쥴러의 핵심 세팅은 3가지 정도 입니다.
+	하나. 실제 주기적으로 실행될 클래스 등록
+	둘. 스케줄러가 동작하는 interval time 설정
+	셋. 실제 동작하게 끔 설정
+	
+	이런 세가지가 있겠습니다.
+	-->	
+	<!-- 하나.주기적으로 실행될 클래스 설정 -->
+    <!-- property name은 jobClass로 fix, value는 사용자가 작성한 class 파일 위치 -->	
+    <bean id = "SystemOutTest" class = "org.springframework.scheduling.quartz.JobDetailBean">
+        <property name = "jobClass" value="com.batch.service.SystemOutTestService" />
+    </bean>
+    
+	<!-- 둘.스케줄러의 interval time 설정 -->
+    <!-- 쿼츠에는 아래와 같이 몇초에 한번씩 돌게 하는 Simple type 과 -->
+    <!-- 무슨 요일 몇시에 한번씩 돌게 하는 날짜로 지정하는 Cron type 이 있다. -->
+    <!-- 현재는 Simple type으로 세팅 -->
+    <!-- jobDetail은 위에서 설정한 실제 동작할 클래스 id를 적어준다 -->
+    <!-- startDelay는 서버 시작후 몇초 뒤에 시작할지 세팅(ms 단위)  -->
+    <!-- repeatInterval은 몇 초에 한번씩 실행될 건지 세팅(ms 단위: 현재 1초) -->        
+    <!-- <bean id = "SystemOutTestTrigger" class ="org.springframework.scheduling.quartz.SimpleTriggerBean">
+        <property name = "jobDetail" ref="SystemOutTest" />
+        <property name = "repeatInterval" value="3000" />
+        <property name = "startDelay" value="2000" />        
+    </bean> -->
+    
+    <!--셋. 실제 동작하게끔 설정 -->
+    <!--ref bean은 위에서 설정한 interval time 아이디를 넣어주면 됨  -->
+    <bean class ="org.springframework.scheduling.quartz.SchedulerFactoryBean" autowire="no">
+		<property name  ="triggers" >
+		    <list>
+		        <ref bean = "SystemOutTestTrigger"/>		        
+		    </list>
+		</property>   
+		<!-- Quartz 실행시 세팅 -->   
+		<property name = "quartzProperties">
+		    <props>
+		        <prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+            	<prop key="org.quartz.threadPool.threadCount">3</prop>
+            	<prop key="org.quartz.threadPool.threadPriority">4</prop>
+            	<prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</prop>
+            	<prop key="org.quartz.jobStore.misfireThreshold">60000</prop>
+		    </props>
+		    
+		</property>
+        
+    </bean>
+</beans>

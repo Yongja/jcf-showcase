@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jcf-showcase" basedir="." default="war">
+	<!-- name info -->
+	<property name="app.name" value="jcf" />
+	<property name="project.name" value="showcase" />
+
+	<!-- directory info -->
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="build.class.dir" value="${build.dir}/classes" />
+
+	<property name="web.dir" value="${basedir}/WebContent"/>
+	<property name="web.lib.dir" value="${web.dir}/WEB-INF/lib" />
+
+<!--  	<property name="was.home" value="/home/itanywhere/Tools/tomcat-7" /> -->
+  	<property name="was.home" value="\JCF\JCF-IDE\was\tomcat\apache-tomcat-7.0.41" />
+  	
+	<!-- clean -->
+	<target name="clean">
+		<delete dir="${build.class.dir}" />
+	</target>
+
+	<target name="init" depends="clean">
+		<mkdir dir="${build.class.dir}"/>
+		<copy todir="${build.class.dir}">
+			<fileset dir="${src.dir}">
+				<include name="META-INF/**/*" />
+				<include name="*.xml"/>
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- compile info -->
+	<path id="build.classpath">
+		<fileset dir="${web.lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${was.home}/lib" />
+	</path>
+
+	<target name="build" depends="init">
+		<javac destdir="${build.class.dir}" debug="true" srcdir="${src.dir}">
+			<classpath refid="build.classpath" />
+		</javac>
+	</target>
+
+	<!-- war -->
+	<target name="war" depends="build">
+		<war destfile="${build.dir}/${app.name}-${project.name}.war" webxml="${web.dir}/WEB-INF/web.xml">
+			<fileset dir="${web.dir}" />
+			<lib dir="${web.lib.dir}" />
+			<classes dir="${build.class.dir}" />
+		</war>
+	</target>
+
+	<!-- jboss deploy -->
+	<!--
+	<property name="jboss.home" value="/usr/share/jboss-as-7.1.1.final" />
+	<property name="jboss.deploy.dir" value="${jboss.home}/standalone/deployments" />
+	<property name="jboss.deploy.war" value="${jboss.deploy.dir}/${app.name}-${project.name}.war" />
+
+ 	<target name="deploy" depends="war">
+		<delete file="${jboss.deploy.war}.deployed" failonerror="faslse" />
+		<waitfor maxwait="10" maxwaitunit="second">
+			<available file="${jboss.deploy.war}.undeployed" />
+		</waitfor>
+		<delete dir="${jboss.deploy.war}" />
+
+		<copy file="${build.dir}/${app.name}-${project.name}.war" todir="${jboss.deploy.dir}" />
+
+		<touch file="${jboss.deploy.war}.dodeploy" />
+
+		<waitfor maxwait="10" maxwaitunit="second">
+			<available file="${jboss.deploy.war}.deployed" />
+		</waitfor>
+	</target> 
+	-->
+	
+	<!-- tomcat deploy -->
+	<property name="tomcat.home" value="\JCF\JCF-IDE\was\tomcat\apache-tomcat-6.0.32" />
+	<property name="tomcat.deploy.dir" value="${tomcat.home}/webapps" />
+	<property name="tomcat.deploy.war" value="${tomcat.deploy.dir}/${app.name}-${project.name}.war" />
+	<property name="tomcat.deploy.folder" value="${tomcat.deploy.dir}/${app.name}-${project.name}" />
+	
+	<target name="deploy" depends="war">
+		<delete file="${tomcat.deploy.war}.deployed" failonerror="false" />
+		<waitfor maxwait="10" maxwaitunit="second">
+			<available file="${tomcat.deploy.war}.undeployed" />
+		</waitfor>
+		<delete dir="${tomcat.deploy.war}" />
+		<delete dir="${tomcat.deploy.folder}" />
+
+		<copy file="${build.dir}/${app.name}-${project.name}.war" todir="${tomcat.deploy.dir}" />
+
+		<touch file="${tomcat.deploy.war}.doployed" />
+
+		<waitfor maxwait="10" maxwaitunit="second">
+			<available file="${tomcat.deploy.war}.deployed" />
+		</waitfor>
+	</target>
+</project>

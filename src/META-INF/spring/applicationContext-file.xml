@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+				http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+	<!-- 파일처리 -->
+	<!-- 파일 업다운로드 핸들러 지정 -->
+	<!--
+	<bean id="fileHandler" class="jcf.sua.mvc.file.MciFileHandler">
+	 	<property name="webFileOperator">
+			<bean class="jcf.sua.ux.webflow.mvc.file.WebFlowFileOperator">
+	          	<property name="receiver" ref="receiver" />
+				<property name="sender" ref="sender"/>
+			</bean>
+		</property>
+	</bean>
+	-->
+	<bean id="fileHandler" class="jcf.sua.mvc.file.MciFileHandler">
+		<property name="webFileOperator" ref="webFlowFileOperator"/>
+	</bean>
+
+	<bean id="webFlowFileOperator" class="jcf.sua.ux.webflow.mvc.file.WebFlowFileOperator">
+		<!-- 실제적인 Upload 처리 -->
+		<property name="receiver" ref="uploadToFile" />
+		<!-- 부가적인 기능 -->
+		<property name="uploadEventHandlers">
+			<map>
+				<entry key="/**/*FileUpload*" value-ref="fileUploadEventHandler"/>
+			</map>
+		</property>
+		<!-- 실제적인 Download 처리 -->
+		<property name="sender" ref="downloadByFile" />
+		<!-- 부가적인 기능 -->
+		<property name="downloadEventHandlers">
+			<map>
+				<entry key="/**/*FileDownload*" value-ref="fileDownloadEventHandler"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- 업로드 처리 -->
+	<bean id="uploadToFile" class="jcf.upload.MultiPartReceiverImpl">
+		<property name="maxUploadSize" value="100000000000" />
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="persistenceManager" ref="filePersistenceManager" />
+	</bean>
+
+	<bean id="fileUploadEventHandler" class="com.jcf.system.file.upload.ShowcaseFileUploadEventHandler" />
+
+	<!-- 다운로드 처리 -->
+	<bean id="downloadByFile" class="jcf.upload.FileSenderImpl">
+		<property name="persistenceManager" ref="filePersistenceManager" />
+	</bean>
+
+	<bean id="fileDownloadEventHandler" class="com.jcf.system.file.download.ShowcaseFileDownloadEventHandler"/>
+
+	<!-- PersistenceManager -->
+	<bean id="filePersistenceManager" class="jcf.sua.mvc.file.DefaultMciPersistenceManager">
+		<property name="baseDirectory" value="#{app['fileBasePath']}"/>
+	</bean>
+
+
+	<!--
+	<bean id="receiver" class="jcf.upload.MultiPartReceiverImpl">
+		<property name="maxUploadSize" value="100000000000" />
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="persistenceManager" ref="persistenceManager" />
+	</bean>
+
+	<bean id="sender" class="jcf.upload.FileSenderImpl">
+		<property name="persistenceManager" ref="persistenceManager" />
+	</bean>
+
+	<bean id="persistenceManager" class="jcf.sua.mvc.file.DefaultMciPersistenceManager">
+		<property name="baseDirectory" value="#{app['fileBasePath']}"/>
+	</bean>
+
+	<bean id="dbUploadPersistenceManager" class="com.jcf.system.sua.mvc.file.DbUploadPersistenceManager">
+        <property name="baseDirectory" value="#{app['fileBasePath']}"/>
+	</bean>
+
+	<bean id="download" class="com.jcf.system.file.download.DownloadEventHandler">
+		<property name="downloadFileLoaderMap">
+			<map>
+				<entry key="FILE"  value-ref="fileSystemFileLoader" />
+				<entry key="DB" value-ref="dataBaseFileLoader"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="fileSystemFileLoader" class="com.jcf.system.file.download.FileSystemFileLoader">
+		<property name="baseDirectory" value="#{app['fileBasePath']}"/>
+	</bean>
+
+	<bean id="dataBaseFileLoader" class="com.jcf.system.file.download.DataBaseFileLoader" />
+ 	-->
+</beans>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC '-//ibatis.apache.org//DTD SQL Map 2.0//EN' 'http://ibatis.apache.org/dtd/sql-map-2.dtd'>
+
+<sqlMap namespace="example">
+
+	<typeAlias alias="searchModel" type="java.util.Map"/>
+	<typeAlias alias="resultModel" type="java.util.Map"/>
+
+	<statement id="getCurrMaxApplyId" resultClass="java.lang.String">
+		SELECT MAX(SAMPLE.APPLY_ID) AS APPLY_ID
+		  FROM APPLY_SAMPLE SAMPLE
+	</statement>
+
+	<statement id="selectExampleList" resultClass="com.jcf.sample.example.model.Example">
+  		SELECT SAMPLE.APPLY_ID,
+   			   SAMPLE.APPLY_NAME,
+   			   SAMPLE.PHONE_NUM,
+   			   SAMPLE.APPLY_DEPT,
+   			   (SELECT DEPT.DEPT_NAME
+  				  FROM APPLY_DEPT DEPT
+     			 WHERE DEPT.DEPT_ID = SAMPLE.APPLY_DEPT) AS DEPT_NAME,
+     		   SAMPLE.DB_FILE_ID,
+		  	   SAMPLE.FILE_SYS_ID
+   		  FROM APPLY_SAMPLE SAMPLE
+	</statement>
+
+	<statement id="selectExample" parameterClass="searchModel" resultClass="com.jcf.sample.example.model.Example">
+  		SELECT SAMPLE.APPLY_ID,
+   			   SAMPLE.APPLY_NAME,
+   			   SAMPLE.PHONE_NUM,
+   			   SAMPLE.APPLY_DEPT,
+			   SAMPLE.DB_FILE_ID,
+		  	   SAMPLE.FILE_SYS_ID
+   		  FROM APPLY_SAMPLE SAMPLE
+   		<dynamic prepend="where">
+			<isNotEmpty prepend="and" property="applyId">
+				SAMPLE.APPLY_ID = #applyId#
+			</isNotEmpty>
+		</dynamic>
+	</statement>
+
+	<insert id="insertApplySample" parameterClass="com.jcf.sample.example.model.Example">
+		INSERT INTO APPLY_SAMPLE
+			(APPLY_ID
+		<dynamic>
+			<isNotEmpty prepend="," property="applyName">APPLY_NAME</isNotEmpty>
+			<isNotEmpty prepend="," property="phoneNum">PHONE_NUM</isNotEmpty>
+			<isNotEmpty prepend="," property="applyDept">APPLY_DEPT</isNotEmpty>
+			<isNotEmpty prepend="," property="dbFileId">DB_FILE_ID</isNotEmpty>
+			<isNotEmpty prepend="," property="fileSysId">FILE_SYS_ID</isNotEmpty>
+		</dynamic>
+			)
+		VALUES
+			(#applyId#
+		<dynamic>
+			<isNotEmpty prepend="," property="applyName">#applyName#</isNotEmpty>
+			<isNotEmpty prepend="," property="phoneNum">#phoneNum#</isNotEmpty>
+			<isNotEmpty prepend="," property="applyDept">#applyDept#</isNotEmpty>
+			<isNotEmpty prepend="," property="dbFileId">#dbFileId#</isNotEmpty>
+			<isNotEmpty prepend="," property="fileSysId">#fileSysId#</isNotEmpty>
+		</dynamic>
+			)
+	</insert>
+
+	<update id="updateApplySample" parameterClass="com.jcf.sample.example.model.Example">
+		UPDATE APPLY_SAMPLE
+		   SET APPLY_NAME = #applyName#
+	       <dynamic>
+				<isNotEmpty prepend="," property="phoneNum">PHONE_NUM = #phoneNum#</isNotEmpty>
+				<isNotEmpty prepend="," property="applyDept">APPLY_DEPT = #applyDept#</isNotEmpty>
+				<isNotEmpty prepend="," property="dbFileId">DB_FILE_ID = #dbFileId#</isNotEmpty>
+				<isNotEmpty prepend="," property="fileSysId">FILE_SYS_ID = #fileSysId#</isNotEmpty>
+			</dynamic>
+		 WHERE APPLY_ID = #applyId#
+	</update>
+
+</sqlMap>
